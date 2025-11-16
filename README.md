@@ -229,8 +229,6 @@ $monitor("input1: %d, input2: %d | add: %d, sub: %d, mlt: %d", input1, input2, a
 * Registers, bus, and ALU interactions follow step-by-step microoperations
 * Testbench demonstrates CPU operation with observable outputs
 
-**Author:** Your Name
-**Date:** 2025
 
 ---
 
