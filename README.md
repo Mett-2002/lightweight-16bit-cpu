@@ -231,5 +231,3 @@ $monitor("input1: %d, input2: %d | add: %d, sub: %d, mlt: %d", input1, input2, a
 
 
 ---
-
-This README provides a complete explanation of the CPU design, modules, memory mapping, ALU functionality, FSM behavior, and simulation details, matching exactly the provided Verilog implementation.
