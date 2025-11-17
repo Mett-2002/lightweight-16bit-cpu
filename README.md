@@ -1,10 +1,12 @@
 # Simple 16-bit CPU in Verilog
 
-This project implements a simple **16-bit CPU** in Verilog with a **microinstruction-based control unit**, supporting arithmetic operations, memory references, register references, and subroutine calls. The design includes a clear separation between the **Control Unit** and the **Datapath**, and is suitable for learning CPU architecture and hardware description in Verilog.
+This project implements a **16-bit CPU** in Verilog with a **microinstruction-based control unit**, supporting arithmetic operations, memory references, register references, and subroutine calls.
+
+The design separates the **Control Unit** from the **Datapath**, making it ideal for learning CPU architecture and hardware description in Verilog.
 
 ---
 
-## Table of Contents
+## 📚 Table of Contents
 
 * [Overview](#overview)
 * [Modules](#modules)
@@ -16,7 +18,7 @@ This project implements a simple **16-bit CPU** in Verilog with a **microinstruc
 
 ---
 
-## Overview
+## 🔹 Overview
 
 This CPU is built around:
 
@@ -24,22 +26,20 @@ This CPU is built around:
 * **ALU:** Supports AND, ADD, LOAD, Complement AC (COM), Shift Right (SHR), Shift Left (SHL)
 * **Extend bit (E):** Used in shifts and carry operations
 * **DataBus:** Multiplexes data between registers and memory
-* **Memory Unit:** 4096 x 16-bit memory with preloaded subroutines
-* **ControlUnit:** Finite state machine (FSM) with four states: `FETCH`, `DECODE`, `INDIRECT`, `EXECUTE`
+* **Memory Unit:** 4096 × 16-bit memory with preloaded subroutines
+* **ControlUnit:** FSM with four states: `FETCH`, `DECODE`, `INDIRECT`, `EXECUTE`
 
-All registers (except IR) can **load, increment, or clear**. IR can only load instructions from the bus.
+All registers (except IR) can **load, increment, or clear**. IR can only **load instructions from the bus**.
 
-The **Control Unit** uses internal **timing signals (T[0..6])** to simulate microinstruction sequencing, enabling step-by-step execution of instructions.
-
-The CPU is designed to execute programs including subroutine calls for arithmetic operations and supports halting via the HLT instruction.
+The **Control Unit** uses timing signals (`T[0..6]`) to simulate **microinstruction sequencing**, enabling step-by-step execution. The CPU supports **subroutine calls** and halting via the **HLT instruction**.
 
 ---
 
-## Modules
+## 🔹 Modules
 
 ### 1. DataBus
 
-The **DataBus** selects data from registers or memory for the CPU bus.
+Selects data from registers or memory for the CPU bus.
 
 | Selector (`s`) | Source |
 | -------------- | ------ |
@@ -55,20 +55,20 @@ The **DataBus** selects data from registers or memory for the CPU bus.
 
 ### 2. Registers
 
-| Register | Inputs | Control | Behavior                               |
-| -------- | ------ | ------- | -------------------------------------- |
-| PC       | Bus    | 3-bit   | Load from bus, increment, clear        |
-| AR       | Bus    | 3-bit   | Load from bus, increment, clear        |
-| DR       | Bus    | 3-bit   | Load from bus, increment, clear        |
-| AC       | ALU    | 3-bit   | Load from ALU output, increment, clear |
-| TR       | Bus    | 3-bit   | Load from bus, increment, clear        |
-| IR       | Bus    | 1-bit   | Load from bus only                     |
+| Register | Inputs | Control | Behavior                        |
+| -------- | ------ | ------- | ------------------------------- |
+| PC       | Bus    | 3-bit   | Load, increment, clear          |
+| AR       | Bus    | 3-bit   | Load, increment, clear          |
+| DR       | Bus    | 3-bit   | Load, increment, clear          |
+| AC       | ALU    | 3-bit   | Load from ALU, increment, clear |
+| TR       | Bus    | 3-bit   | Load, increment, clear          |
+| IR       | Bus    | 1-bit   | Load from bus only              |
 
 ---
 
 ### 3. ALU
 
-The ALU performs arithmetic and logical operations. Control signals:
+Performs arithmetic and logical operations.
 
 | alu_s | Operation  | Description              |
 | ----- | ---------- | ------------------------ |
@@ -89,13 +89,13 @@ The ALU performs arithmetic and logical operations. Control signals:
 | 10     | Complement E |
 | 00     | No change    |
 
-The ALU handles the extend bit (`E`) during shifts and arithmetic carry operations.
+The ALU uses the **extend bit (`E`)** during shifts and arithmetic carries.
 
 ---
 
 ### 4. Control Unit (FSM)
 
-The **ControlUnit** uses a microinstruction-based FSM with four states:
+The **ControlUnit** uses a microinstruction-based FSM with **four states**:
 
 1. **FETCH:**
 
@@ -119,20 +119,19 @@ The **ControlUnit** uses a microinstruction-based FSM with four states:
    * Execute memory-reference instructions (AND, ADD, LDA, STA, BUN, BSA, ISZ)
    * Execute register-reference instructions (CLA, CLE, CMA, CME, CIR, CIL, INC, SPA, SNA, SZA, SZE, HLT)
 
-**Timing signals (T[0..6])** control the microoperations step by step.
-
-The FSM uses registers `T`, `D`, and `sc` to manage microinstruction timing, opcode decoding, and instruction sequencing.
+**Timing signals (T[0..6])** control microoperations step by step. Registers `T`, `D`, and `sc` manage **instruction sequencing and opcode decoding**.
 
 ---
 
 ### 5. Memory Unit
 
-* 4096 x 16-bit memory
+* 4096 × 16-bit memory
 * **Control signals:**
 
   * `01` → Read
   * `10` → Write
-* Special addresses for arithmetic operations:
+
+**Special addresses for arithmetic operations:**
 
 | Address    | Purpose    |
 | ---------- | ---------- |
@@ -142,29 +141,28 @@ The FSM uses registers `T`, `D`, and `sc` to manage microinstruction timing, opc
 | F03 (3843) | sub result |
 | F04 (3844) | mul result |
 
-* Preloaded subroutines (Addition, Subtraction, Multiplication) and main program (BSA calls, HALT) are included.
-* Temporary memory locations F05, F06, etc., are used internally for calculations.
+Memory includes **preloaded subroutines** (Addition, Subtraction, Multiplication) and the **main program** (BSA calls, HALT). Temporary locations (F05, F06…) support intermediate calculations.
 
 ---
 
 ### 6. Datapath
 
-Connects all registers, ALU, bus, and memory. Handles signal propagation between CPU components and ALU input/output. It ensures proper sequencing of data flow according to control signals from the Control Unit.
+Connects registers, ALU, bus, and memory. Ensures **signal propagation** according to control signals from the Control Unit, supporting step-by-step microoperation sequencing.
 
 ---
 
 ### 7. CPU Top Module
 
 * Integrates `ControlUnit` and `Datapath`
-* Inputs: `clk`, `input1`, `input2`
-* Outputs: `add`, `sub`, `mlt` results
-* Monitors ALU results and memory outputs as they update in real time.
+* **Inputs:** `clk`, `input1`, `input2`
+* **Outputs:** `add`, `sub`, `mlt` results
+* Monitors ALU results and memory outputs in real time
 
 ---
 
-## Instruction Set
+## 🔹 Instruction Set
 
-### Memory Reference Instructions (D[0..6])
+### Memory Reference Instructions (`D[0..6]`)
 
 * D[0] → AND AC, M
 * D[1] → ADD M to AC
@@ -174,7 +172,7 @@ Connects all registers, ALU, bus, and memory. Handles signal propagation between
 * D[5] → BSA (Branch and Save return address)
 * D[6] → ISZ (Increment memory and skip if zero)
 
-### Register Reference Instructions (IR[11:0])
+### Register Reference Instructions (`IR[11:0]`)
 
 * CLA → Clear AC
 * CLE → Clear E
@@ -191,11 +189,11 @@ Connects all registers, ALU, bus, and memory. Handles signal propagation between
 
 ---
 
-## Simulation & Testbench
+## 🔹 Simulation & Testbench
 
 * Synchronous design (positive-edge clock)
-* Testbench inputs `input1` and `input2`
-* Monitors `add`, `sub`, `mlt` results:
+* Inputs: `input1`, `input2`
+* Monitors outputs: `add`, `sub`, `mlt`
 
 ```verilog
 input1 = 50;
@@ -203,31 +201,31 @@ input2 = 30;
 $monitor("input1: %d, input2: %d | add: %d, sub: %d, mlt: %d", input1, input2, add, sub, mlt);
 ```
 
-* Clock generated using: `always #20 clk = ~clk;`
-* Subroutine execution and HALT are correctly simulated.
-* Memory locations are updated in real time with inputs, and results are stored at designated addresses.
+* Clock generation: `always #20 clk = ~clk;`
+* Subroutine execution and HALT instruction simulated correctly
+* Memory locations updated in real time
 
 ---
 
-## Datapath & Control Flow
+## 🔹 Datapath & Control Flow
 
 1. **Instruction Fetch:** PC → AR → Memory → IR → PC incremented
-2. **Instruction Decode:** Opcode decoding → Identify instruction type → Set AR for memory reference or register reference
-3. **Indirect Access:** Fetch effective address if indirect bit is set
-4. **Execution:** Perform operation (ALU operation, memory read/write, branch, subroutine call)
-5. **Result Storage:** Update AC, memory, or PC as needed
-6. **Repeat:** FSM returns to FETCH for next instruction until HLT is encountered
+2. **Instruction Decode:** Opcode decoding → identify instruction type → set AR for memory or register reference
+3. **Indirect Access:** Fetch effective address if indirect bit set
+4. **Execution:** ALU operation, memory read/write, branch, or subroutine call
+5. **Result Storage:** Update AC, memory, or PC
+6. **Repeat:** FSM returns to FETCH until HLT
 
 ---
 
-## Notes
+## 📝 Notes
 
-* Designed for **learning CPU architecture** and **Verilog hardware description**
-* ControlUnit FSM simulates real microinstruction timing
-* Datapath and ALU provide arithmetic/logical operations with extend bit handling
-* Memory preloaded with example program and arithmetic subroutines
-* Registers, bus, and ALU interactions follow step-by-step microoperations
-* Testbench demonstrates CPU operation with observable outputs
-
+* Ideal for **learning CPU architecture** and **Verilog hardware description**
+* FSM simulates **microinstruction timing**
+* Datapath and ALU implement arithmetic/logical operations with **extend bit**
+* Memory preloaded with example programs and subroutines
+* Step-by-step microoperations observable via testbench
+* Registers, bus, and ALU interactions follow **clear control sequencing**
 
 ---
+
