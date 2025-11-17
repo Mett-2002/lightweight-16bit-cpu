@@ -220,7 +220,7 @@ $monitor("input1: %d, input2: %d | add: %d, sub: %d, mlt: %d", input1, input2, a
 
 ---
 
-## Author & Notes
+## Notes
 
 * Designed for **learning CPU architecture** and **Verilog hardware description**
 * ControlUnit FSM simulates real microinstruction timing
