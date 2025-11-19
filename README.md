@@ -1,4 +1,4 @@
-# Simple 16-bit CPU in Verilog
+# Lightweight 16-bit CPU in Verilog
 
 This project implements a **16-bit CPU** in Verilog with a **microinstruction-based control unit**, supporting arithmetic operations, memory references, register references, and subroutine calls.
 
